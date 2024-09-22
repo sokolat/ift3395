@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -95,10 +96,16 @@ class ErrorRate:
         self.y_val = y_val
 
     def hard_parzen(self, h):
-        pass
+        hardParzen = HardParzen(h)
+        hardParzen.fit(self.x_train, self.y_train)
+        y_pred = hardParzen.predict(self.x_val)
+        return np.sum(y_pred != self.y_val) / len(self.y_val)
 
     def soft_parzen(self, sigma):
-        pass
+        softParzen = SoftRBFParzen(sigma)
+        softParzen.fit(self.x_train, self.y_train)
+        y_pred = softParzen.predict(self.x_val)
+        return np.sum(y_pred != self.y_val) / len(self.y_val)
 
 
 def get_test_errors(iris):
@@ -107,3 +114,15 @@ def get_test_errors(iris):
 
 def random_projections(X, A):
     pass
+
+
+iris = np.genfromtxt("iris.txt")
+
+train, val, test = split_dataset(iris)
+e = ErrorRate(train[:, :-1], train[:, -1], val[:, :-1], val[:, -1])
+
+windows = [0.01, 0.1, 0.3, 0.4, 0.5, 1.0, 3.0, 10.0, 20.0]
+hard_parzen_error_rates = [e.hard_parzen(window) for window in windows]
+
+plt.plot(windows, hard_parzen_error_rates)
+plt.show()
