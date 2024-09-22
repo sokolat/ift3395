@@ -99,17 +99,22 @@ class ErrorRate:
         hardParzen = HardParzen(h)
         hardParzen.fit(self.x_train, self.y_train)
         y_pred = hardParzen.predict(self.x_val)
-        return np.sum(y_pred != self.y_val) / len(self.y_val)
+        return float(np.sum(y_pred != self.y_val) / len(self.y_val))
 
     def soft_parzen(self, sigma):
         softParzen = SoftRBFParzen(sigma)
         softParzen.fit(self.x_train, self.y_train)
         y_pred = softParzen.predict(self.x_val)
-        return np.sum(y_pred != self.y_val) / len(self.y_val)
+        return float(np.sum(y_pred != self.y_val) / len(self.y_val))
 
 
 def get_test_errors(iris):
-    pass
+    train, val, test = split_dataset(iris)
+    e_val = ErrorRate(train[:, :-1], train[:, -1], val[:, :-1], val[:, -1])
+    h_opt = params[np.argmin([e_val.hard_parzen(param) for param in params])]
+    sig_opt = params[np.argmin([e_val.soft_parzen(param) for param in params])]
+    e_test = ErrorRate(train[:, :-1], train[:, -1], test[:, :-1], test[:, -1])
+    return [e_test.hard_parzen(h_opt), e_test.soft_parzen(sig_opt)]
 
 
 def random_projections(X, A):
@@ -121,8 +126,18 @@ iris = np.genfromtxt("iris.txt")
 train, val, test = split_dataset(iris)
 e = ErrorRate(train[:, :-1], train[:, -1], val[:, :-1], val[:, -1])
 
-windows = [0.01, 0.1, 0.3, 0.4, 0.5, 1.0, 3.0, 10.0, 20.0]
-hard_parzen_error_rates = [e.hard_parzen(window) for window in windows]
+params = [0.01, 0.1, 0.3, 0.4, 0.5, 1.0, 3.0, 10.0, 20.0]
+hard_parzen_error_rates = [e.hard_parzen(param) for param in params]
+soft_rbf_parzen_error_rate = [e.soft_parzen(param) for param in params]
 
-plt.plot(windows, hard_parzen_error_rates)
+plt.plot(params, hard_parzen_error_rates, label="hard parzen")
+plt.plot(params, soft_rbf_parzen_error_rate, label="soft rbf parzen")
+
+plt.xlabel("paramètre")
+plt.ylabel("taux d'erreur")
+
+plt.legend(loc="upper right")
+
+plt.savefig("error_rate.png")
+
 plt.show()
