@@ -160,3 +160,14 @@ error_rate_soft_val_proj = [
     [error_rate.soft_parzen(param) for param in params]
     for error_rate in error_rate_proj
 ]
+
+plt.plot(params, 0.002 * np.sum(error_rate_hard_val_proj, axis=0), label="hard parzen")
+plt.plot(params, 0.002 * np.sum(error_rate_soft_val_proj, axis=0), label="soft parzen")
+
+plt.xlabel("paramètre")
+plt.ylabel("taux d'erreur moyen")
+
+plt.legend(loc="upper right")
+
+plt.savefig("mean_error_rate.png")
+plt.show()
