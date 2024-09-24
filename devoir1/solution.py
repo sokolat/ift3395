@@ -110,25 +110,25 @@ class ErrorRate:
 
 def get_test_errors(iris):
     train, val, test = split_dataset(iris)
-    e_val = ErrorRate(train[:, :-1], train[:, -1], val[:, :-1], val[:, -1])
-    h_opt = params[np.argmin([e_val.hard_parzen(param) for param in params])]
+    error_rate_val = ErrorRate(train[:, :-1], train[:, -1], val[:, :-1], val[:, -1])
+    h_opt = params[np.argmin([error_rate_val.hard_parzen(param) for param in params])]
     sig_opt = params[np.argmin([e_val.soft_parzen(param) for param in params])]
-    e_test = ErrorRate(train[:, :-1], train[:, -1], test[:, :-1], test[:, -1])
-    return [e_test.hard_parzen(h_opt), e_test.soft_parzen(sig_opt)]
+    error_rate_test = ErrorRate(train[:, :-1], train[:, -1], test[:, :-1], test[:, -1])
+    return [error_rate_test.hard_parzen(h_opt), error_rate_test.soft_parzen(sig_opt)]
 
 
 def random_projections(X, A):
-    pass
+    return (1 / np.sqrt(2)) * X @ A
 
 
 iris = np.genfromtxt("iris.txt")
 
 train, val, test = split_dataset(iris)
-e = ErrorRate(train[:, :-1], train[:, -1], val[:, :-1], val[:, -1])
+error_rate = ErrorRate(train[:, :-1], train[:, -1], val[:, :-1], val[:, -1])
 
-params = [0.01, 0.1, 0.3, 0.4, 0.5, 1.0, 3.0, 10.0, 20.0]
-hard_parzen_error_rates = [e.hard_parzen(param) for param in params]
-soft_rbf_parzen_error_rate = [e.soft_parzen(param) for param in params]
+params = [0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 3.0, 10.0, 20.0]
+hard_parzen_error_rates = [error_rate.hard_parzen(param) for param in params]
+soft_rbf_parzen_error_rate = [error_rate.soft_parzen(param) for param in params]
 
 plt.plot(params, hard_parzen_error_rates, label="hard parzen")
 plt.plot(params, soft_rbf_parzen_error_rate, label="soft rbf parzen")
@@ -141,3 +141,22 @@ plt.legend(loc="upper right")
 plt.savefig("error_rate.png")
 
 plt.show()
+
+proj_matrices = np.random.randn(500, 4, 2)
+train_proj = [random_projections(train[:, :-1], proj_mat) for proj_mat in proj_matrices]
+val_proj = [random_projections(val[:, :-1], proj_mat) for proj_mat in proj_matrices]
+
+error_rate_proj = [
+    ErrorRate(train_proj[index], train[:, -1], val_proj[index], val[:, -1])
+    for index in range(500)
+]
+
+error_rate_hard_val_proj = [
+    [error_rate.hard_parzen(param) for param in params]
+    for error_rate in error_rate_proj
+]
+
+error_rate_soft_val_proj = [
+    [error_rate.soft_parzen(param) for param in params]
+    for error_rate in error_rate_proj
+]
