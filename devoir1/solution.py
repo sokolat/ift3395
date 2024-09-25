@@ -112,7 +112,7 @@ def get_test_errors(iris):
     train, val, test = split_dataset(iris)
     error_rate_val = ErrorRate(train[:, :-1], train[:, -1], val[:, :-1], val[:, -1])
     h_opt = params[np.argmin([error_rate_val.hard_parzen(param) for param in params])]
-    sig_opt = params[np.argmin([e_val.soft_parzen(param) for param in params])]
+    sig_opt = params[np.argmin([error_rate_val.soft_parzen(param) for param in params])]
     error_rate_test = ErrorRate(train[:, :-1], train[:, -1], test[:, :-1], test[:, -1])
     return [error_rate_test.hard_parzen(h_opt), error_rate_test.soft_parzen(sig_opt)]
 
