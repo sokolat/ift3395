@@ -161,8 +161,15 @@ error_rate_soft_val_proj = [
     for error_rate in error_rate_proj
 ]
 
+params_std = np.std(params, ddof=1)
+params_mean = np.mean(params)
+print()
+
 plt.plot(params, 0.002 * np.sum(error_rate_hard_val_proj, axis=0), label="hard parzen")
 plt.plot(params, 0.002 * np.sum(error_rate_soft_val_proj, axis=0), label="soft parzen")
+
+plt.axvline(x=params_mean - 0.1 * params_std, color="r", linestyle="--")
+plt.axvline(x=params_mean + 0.1 * params_std, color="r", linestyle="--")
 
 plt.xlabel("paramètre")
 plt.ylabel("taux d'erreur moyen")
