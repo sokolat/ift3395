@@ -67,14 +67,14 @@ class SoftRBFParzen:
 
     def predict(self, test_data):
         Y_pred = np.zeros(len(test_data))
+        one_hot_labels = np.zeros((len(self.train_targets), self.labels.max() + 1))
+        one_hot_labels[np.arange(len(self.train_targets)), self.train_targets] = 1
         for index, test_input in enumerate(test_data):
             rbf_kernel_vals = np.exp(
                 -0.5
                 * np.sum(np.abs(test_input - self.train_inputs), axis=1) ** 2
                 / self.sigma**2
             )
-            one_hot_labels = np.zeros((len(self.train_targets), self.labels.max() + 1))
-            one_hot_labels[np.arange(len(self.train_targets)), self.train_targets] = 1
             Y_pred[index] = np.argmax(
                 np.sum(rbf_kernel_vals[:, None] * one_hot_labels, axis=0)
             )
