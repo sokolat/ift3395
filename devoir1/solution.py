@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.spatial import Voronoi, voronoi_plot_2d
 
 
 ######## DO NOT MODIFY THIS FUNCTION ########
@@ -121,6 +122,7 @@ def random_projections(X, A):
     return (1 / np.sqrt(2)) * X @ A
 
 
+"""
 iris = np.genfromtxt("iris.txt")
 
 train, val, test = split_dataset(iris)
@@ -141,7 +143,9 @@ plt.grid()
 plt.savefig("error_rate.png")
 
 plt.show()
+"""
 
+"""
 proj_matrices = np.random.randn(500, 4, 2)
 train_proj = [random_projections(train[:, :-1], proj_mat) for proj_mat in proj_matrices]
 val_proj = [random_projections(val[:, :-1], proj_mat) for proj_mat in proj_matrices]
@@ -173,7 +177,6 @@ plt.plot(
     marker="o",
     label="soft parzen",
 )
-
 plt.xlabel("paramètre")
 plt.ylabel("taux d'erreur moyen")
 
@@ -181,4 +184,118 @@ plt.legend(loc="upper right")
 plt.grid()
 
 plt.savefig("mean_error_rate.png")
+plt.show()
+"""
+
+points = np.array([[5, -2], [2, -10], [2, -15], [8, 0], [2, 5], [8, 5]])
+vor = Voronoi(points)
+voronoi_plot_2d(
+    vor, show_vertices=False, line_colors="blue", line_width=2, line_alpha=0.6
+)
+plt.plot(points[:3, 0], points[:3, 1], "ro", label="Classe 1")
+plt.plot(points[3:, 0], points[3:, 1], "go", label="Classe 2")
+plt.title("Diagramme de Voronoi avec 2 classes")
+plt.xlim(-20, 20)
+plt.ylim(-20, 20)
+plt.xlabel("x1")
+plt.ylabel("x2")
+plt.grid()
+plt.savefig("voronoi_diagram_2_class.png")
+plt.show()
+mean_class_1 = np.mean(points[:3], axis=0)
+mean_class_2 = np.mean(points[3:], axis=0)
+
+plt.plot(points[:3, 0], points[:3, 1], "ro", label="Classe 1")
+plt.plot(points[3:, 0], points[3:, 1], "go", label="Classe 2")
+
+plt.plot(
+    mean_class_1[0],
+    mean_class_1[1],
+    color="r",
+    marker="X",
+    label="Moyenne Classe 0",
+)
+plt.plot(
+    mean_class_2[0],
+    mean_class_2[1],
+    color="g",
+    marker="X",
+    label="Moyenne Classe 1",
+)
+
+decision_boundary = (mean_class_1 + mean_class_2) / 2
+plt.axline(
+    decision_boundary,
+    slope=-(mean_class_2[0] - mean_class_1[0]) / (mean_class_2[1] - mean_class_1[1]),
+    color="black",
+    linestyle="--",
+    label="Frontière de décision",
+)
+plt.title("Classification binaire")
+plt.xlim(-20, 20)
+plt.ylim(-20, 20)
+plt.xlabel("x1")
+plt.ylabel("x2")
+plt.grid()
+plt.savefig("binary_classification.png")
+plt.show()
+
+points = np.array(
+    [[5, -2], [2, -10], [2, -15], [8, 0], [2, 5], [8, 5], [3, 1], [-3, 0], [5, -8]]
+)
+vor = Voronoi(points)
+voronoi_plot_2d(
+    vor, show_vertices=False, line_colors="blue", line_width=2, line_alpha=0.6
+)
+plt.plot(points[:3, 0], points[:3, 1], "ro", label="Classe 1")
+plt.plot(points[3:6, 0], points[3:6, 1], "go", label="Classe 2")
+plt.plot(points[6:, 0], points[6:, 1], "bo", label="Classe 3")
+plt.title("Diagramme de Voronoi avec 3 classes")
+plt.xlim(-20, 20)
+plt.ylim(-20, 20)
+plt.xlabel("x1")
+plt.ylabel("x2")
+plt.grid()
+plt.savefig("voronoi_diagram_3_class.png")
+plt.show()
+mean_class_1 = np.mean(points[:3], axis=0)
+mean_class_2 = np.mean(points[3:6], axis=0)
+mean_class_3 = np.mean(points[6:], axis=0)
+
+vor = Voronoi([mean_class_1, mean_class_2, mean_class_3])
+voronoi_plot_2d(
+    vor, show_vertices=False, line_colors="blue", line_width=2, line_alpha=0.6
+)
+plt.plot(
+    mean_class_1[0],
+    mean_class_1[1],
+    color="r",
+    marker="X",
+    label="Moyenne Classe 0",
+)
+plt.plot(
+    mean_class_2[0],
+    mean_class_2[1],
+    color="g",
+    marker="X",
+    label="Moyenne Classe 1",
+)
+plt.plot(
+    mean_class_3[0],
+    mean_class_3[1],
+    color="b",
+    marker="X",
+    label="Moyenne Classe 2",
+)
+plt.plot(points[:3, 0], points[:3, 1], "ro", label="Classe 1")
+plt.plot(points[3:6, 0], points[3:6, 1], "go", label="Classe 2")
+plt.plot(points[6:, 0], points[6:, 1], "bo", label="Classe 3")
+
+plt.title("Classification multiple")
+plt.xlim(-20, 20)
+plt.ylim(-20, 20)
+plt.xlabel("x1")
+plt.ylabel("x2")
+plt.grid()
+plt.savefig("multi_classification.png")  # Save before show
 plt.show()
