@@ -187,6 +187,7 @@ plt.savefig("mean_error_rate.png")
 plt.show()
 """
 
+"""
 points = np.array([[5, -2], [2, -10], [2, -15], [8, 0], [2, 5], [8, 5]])
 vor = Voronoi(points)
 voronoi_plot_2d(
@@ -299,3 +300,4 @@ plt.ylabel("x2")
 plt.grid()
 plt.savefig("multi_classification.png")  # Save before show
 plt.show()
+"""
