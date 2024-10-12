@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import pyplot as plt
 from scipy.spatial import Voronoi, voronoi_plot_2d
 
 
@@ -122,30 +122,29 @@ def random_projections(X, A):
     return (1 / np.sqrt(2)) * X @ A
 
 
-"""
+params = [0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 3.0, 10.0, 20.0]
+
 iris = np.genfromtxt("iris.txt")
 
 train, val, test = split_dataset(iris)
 error_rate = ErrorRate(train[:, :-1], train[:, -1], val[:, :-1], val[:, -1])
 
-params = [0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 3.0, 10.0, 20.0]
 hard_parzen_error_rates = [error_rate.hard_parzen(param) for param in params]
 soft_rbf_parzen_error_rate = [error_rate.soft_parzen(param) for param in params]
 
 plt.plot(params, hard_parzen_error_rates, marker="o", label="hard parzen")
 plt.plot(params, soft_rbf_parzen_error_rate, marker="o", label="soft rbf parzen")
 
-plt.xlabel("paramètre")
+plt.xlabel("h \\ sigma")
 plt.ylabel("taux d'erreur")
+plt.title("taux d'erreur de validation")
 
 plt.legend(loc="upper right")
 plt.grid()
 plt.savefig("error_rate.png")
 
 plt.show()
-"""
 
-"""
 proj_matrices = np.random.randn(500, 4, 2)
 train_proj = [random_projections(train[:, :-1], proj_mat) for proj_mat in proj_matrices]
 val_proj = [random_projections(val[:, :-1], proj_mat) for proj_mat in proj_matrices]
@@ -165,29 +164,33 @@ error_rate_soft_val_proj = [
     for error_rate in error_rate_proj
 ]
 
-plt.plot(
+plt.errorbar(
     params,
     0.002 * np.sum(error_rate_hard_val_proj, axis=0),
+    yerr=0.2 * np.std(error_rate_hard_val_proj, axis=0),
     marker="o",
     label="hard parzen",
+    capsize=4,
 )
-plt.plot(
+
+plt.errorbar(
     params,
     0.002 * np.sum(error_rate_soft_val_proj, axis=0),
+    yerr=0.2 * np.std(error_rate_soft_val_proj, axis=0),
     marker="o",
     label="soft parzen",
+    capsize=4,
 )
-plt.xlabel("paramètre")
+plt.xlabel("h \\ sigma")
 plt.ylabel("taux d'erreur moyen")
+plt.title("taux d'erreur moyens de validation pour chaque valeur de h et sigma")
 
 plt.legend(loc="upper right")
 plt.grid()
 
 plt.savefig("mean_error_rate.png")
 plt.show()
-"""
 
-"""
 points = np.array([[5, -2], [2, -10], [2, -15], [8, 0], [2, 5], [8, 5]])
 vor = Voronoi(points)
 voronoi_plot_2d(
@@ -298,6 +301,5 @@ plt.ylim(-20, 20)
 plt.xlabel("x1")
 plt.ylabel("x2")
 plt.grid()
-plt.savefig("multi_classification.png")  # Save before show
+plt.savefig("multi_classification.png")
 plt.show()
-"""
