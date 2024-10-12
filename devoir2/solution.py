@@ -136,6 +136,10 @@ class PracticalHomework2:
         - Returns a label array of shape (n_samples, num_classes) with -1 for non-class columns
           and 1 for the true class column.
         """
+        one_vs_all_labels = -1 * np.ones((len(y), num_classes), dtype=np.int8)
+        for i, label in enumerate(np.array(y, dtype=np.int8)):
+            one_vs_all_labels[i][label] += 2
+        return one_vs_all_labels
 
     def compute_loss(self, X, y, w, C):
         """
@@ -154,7 +158,12 @@ class PracticalHomework2:
         Output:
         - Returns the scalar loss value (float).
         """
-        raise NotImplementedError
+        reg_terms = [0.5 * C * weight.T @ weight for weight in w.T]
+        loss_per_class = (X @ w) * y
+        vectorized_max = np.vectorize(lambda val: max(0, 2 - val) ** 2)
+        loss_per_class = vectorized_max(loss_per_class)
+        loss = (1 / y.shape[0]) * np.sum(np.sum(loss_per_class + reg_terms, axis=1))
+        return loss
 
     def compute_gradient(self, X, y, w, C):
         """
@@ -173,7 +182,12 @@ class PracticalHomework2:
         Output:
         - Returns the gradient matrix of shape (n_features, n_classes).
         """
-        raise NotImplementedError
+        reg_term_grad = C * w
+        sqrt_loss = (X @ w) * y
+        vectorized_max = np.vectorize(lambda val: max(0, 2 - val))
+        sqrt_loss = vectorized_max(sqrt_loss)
+        grad_mat = (-2 / y.shape[0]) * X.T @ (sqrt_loss * y) + reg_term_grad
+        return grad_mat
 
     def infer(self, X, w):
         """
@@ -294,5 +308,9 @@ homework.generate_data(42)
 X_train, y_train, X_val, y_val, X_test, y_test = homework.load_and_preprocess_data()
 
 num_classes = len(np.unique(np.concatenate((y_train, y_val, y_test))))
-print(num_classes)
-homework.make_one_versus_all_labels(y_train, num_classes)
+homework.compute_gradient(
+    X_train,
+    homework.make_one_versus_all_labels(y_train, num_classes),
+    np.ones((len(X_train[0]), 3)),
+    2,
+)
