@@ -136,7 +136,7 @@ class PracticalHomework2:
         - Returns a label array of shape (n_samples, num_classes) with -1 for non-class columns
           and 1 for the true class column.
         """
-        one_vs_all_labels = -1 * np.ones((len(y), num_classes), dtype=np.int8)
+        one_vs_all_labels = -1 * np.ones((y.shape[0], num_classes), dtype=np.int8)
         for i, label in enumerate(np.array(y, dtype=np.int8)):
             one_vs_all_labels[i][label] += 2
         return one_vs_all_labels
@@ -204,7 +204,7 @@ class PracticalHomework2:
         Output:
         - Returns an array of predicted class labels of shape (n_samples,).
         """
-        raise NotImplementedError
+        return np.argmax(X @ w, axis=1)
 
     def fit(
         self,
@@ -300,17 +300,10 @@ class PracticalHomework2:
         Output:
         - Returns the accuracy score (float) as a percentage of correct predictions.
         """
-        raise NotImplementedError
+        y_inferred = self.infer(X, w)
+        return np.sum(y_inferred == y) / y.shape[0]
 
 
 homework = PracticalHomework2()
 homework.generate_data(42)
 X_train, y_train, X_val, y_val, X_test, y_test = homework.load_and_preprocess_data()
-
-num_classes = len(np.unique(np.concatenate((y_train, y_val, y_test))))
-homework.compute_gradient(
-    X_train,
-    homework.make_one_versus_all_labels(y_train, num_classes),
-    np.ones((len(X_train[0]), 3)),
-    2,
-)
